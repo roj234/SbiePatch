@@ -1,0 +1,6 @@
+bin/*
+bin_loader/SbiePatch.sys
+bin_loader/lua53-64.dll
+SbiePatch/SbiePatch.c
+/*.sig
+/*.exe
