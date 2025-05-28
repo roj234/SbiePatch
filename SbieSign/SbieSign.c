@@ -302,6 +302,8 @@ int main(int argc, char** argv) {
     SignFile(hKey, "SbieSvc.exe");
     SignFile(hKey, "SbieCtrl.exe");
     SignFile(hKey, "SandMan.exe");
+    for (int i = 1; i < argc; i++)
+        SignFile(hKey, argv[i]);
 
     printf("All done");
 

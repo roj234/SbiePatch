@@ -2,5 +2,7 @@ bin/*
 bin_loader/SbiePatch.sys
 bin_loader/lua53-64.dll
 SbiePatch/SbiePatch.c
+Dll2Lib/Dll2Lib.exe
+SbieSign/SbieSign.exe
 /*.sig
 /*.exe
