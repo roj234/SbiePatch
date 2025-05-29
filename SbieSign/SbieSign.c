@@ -248,11 +248,12 @@ static const UCHAR officialKey[] =
     0x14, 0xF5, 0x19, 0xAA, 0x2D, 0xEE, 0x50, 0x10
 };
 
-#ifndef USER_NAME
-#define USER_NAME L"SbiePatch"
-#endif
-
 int main(int argc, char** argv) {
+    if (argc < 3) {
+        printf("Usage: %s <UserName> [...FilesToReplace] \"\" [...FilesToSign]", argv[0]);
+        return 1;
+    }
+
     BCRYPT_ALG_HANDLE hAlg = NULL;
     BCRYPT_KEY_HANDLE hKey = NULL;
     NTSTATUS status;
@@ -267,7 +268,15 @@ int main(int argc, char** argv) {
 
     BCryptExportKey(hKey, NULL, KPH_BLOB_PUBLIC, pbPublicKey, cbPublicKey, &cbPublicKey, 0);
 
-    wcscat(certificate, L"NAME: " USER_NAME L"\nTYPE: ETERNAL");
+    wcscat(certificate, L"NAME: ");
+    WCHAR wideStr[128];
+    MultiByteToWideChar(
+            CP_UTF8, 0,
+            argv[1], -1,
+            wideStr, sizeof(wideStr)
+    );
+    wcscat(certificate, wideStr);
+    wcscat(certificate, L"\nTYPE: ETERNAL");
 
     // 以C语言数组格式输出公钥
     printf("static const UCHAR Replace[] = { ");
@@ -281,29 +290,22 @@ int main(int argc, char** argv) {
 
     SignCertificate(hKey);
 
-    int result;
-    result = ReplaceContent("SbieSvc.exe", officialKey, pbPublicKey, cbPublicKey);
-    if (result != 1) {
-        if (result == 0) printf("未在 %s 中找到公钥\n", "SbieSvc.exe");
-        goto cleanup;
-    }
-    result = ReplaceContent("SandMan.exe", officialKey, pbPublicKey, cbPublicKey);
-    if (result != 1) {
-        if (result == 0) printf("未在 %s 中找到公钥\n", "SandMan.exe");
-        goto cleanup;
-    }
-    result = ReplaceContent("UpdUtil.exe", officialKey, pbPublicKey, cbPublicKey);
-    if (result != 1) {
-        if (result == 0) printf("未在 %s 中找到公钥\n", "UpdUtil.exe");
-        goto cleanup;
-    }
+    int i = 2;
+    for (; i < argc; i++) {
+        if (strlen(argv[i]) == 0) {
+            i++;
+            break;
+        }
 
-    SignFile(hKey, "Start.exe");
-    SignFile(hKey, "SbieSvc.exe");
-    SignFile(hKey, "SbieCtrl.exe");
-    SignFile(hKey, "SandMan.exe");
-    for (int i = 1; i < argc; i++)
+        int result = ReplaceContent(argv[i], officialKey, pbPublicKey, cbPublicKey);
+        if (result != 1) {
+            if (result == 0) printf("未在 %s 中找到公钥\n", "SbieSvc.exe");
+            goto cleanup;
+        }
+    }
+    for (; i < argc; i++) {
         SignFile(hKey, argv[i]);
+    }
 
     printf("All done");
 

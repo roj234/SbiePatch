@@ -28,9 +28,10 @@
 - 无需Windows SDK或Windows驱动SDK
 
 ### 🖊 编译配置 (通过修改build.bat)
-1. 编译SbieSign时可以定义宏 USER_NAME 自定义证书的用户名，格式为 L"用户名"
-2. (v1.1) SbieSign支持对更多文件生成签名了，所有在参数里的文件都会签名
-3. 注意SbieSign的私钥为了安全是不保存的一次性的，意味着**一旦程序退出，就不能再生成相同公钥的签名了**！
+1. 注意SbieSign的私钥为了安全是不保存的一次性的，意味着**一旦程序退出，就不能再生成相同公钥的签名了**！
+2. (v1.2) 构建不是无人参与的，需要你设置生成证书的用户名
+3. 构建在10秒内完成，也无需联网，所以不用担心要在电脑之前等很久
+4. 你可以修改构建脚本来为你提供的其它程序生成sig文件
 
 ### 🐙 编译
 1. 从官方Sandboxie-Plus复制以下文件到 `bin/` 目录：
@@ -38,7 +39,6 @@
     - SbieCtrl.exe
     - SbieSvc.exe
     - Start.exe
-    - UpdUtil.exe
     - SbieDll.Dll
 
 2. 执行构建脚本：
@@ -52,21 +52,26 @@ build.bat
 
 ## 🚀 部署
 
-### ⚙ 驱动修补
-1. 执行`bin_loader/patch.bat`并将其设为开机启动
-```bash
-# 以管理员身份执行驱动修补
-.\bin_loader\patch.bat
+### ⚙ 修补驱动
+> 为了防止蓝屏，每次开机只能进行一次修补，如果忘记在修补之前加载SbieDrv请重启电脑
 
+以管理员身份执行下列命令 (你可以将`bin_loader`复制到任何你喜欢的目录，例如沙箱安装位置)
+```bash
+# 禁止沙箱服务开机自启
+sc config SbieSvc start=demand
+# 停止沙箱服务
+net stop SbieSvc
+# 修补驱动程序
+.\bin_loader\patch.bat
 # 设置开机自启动
-schtasks /create /tn "SbiePatch" /tr "%~dp0\bin_loader\patch.bat" /sc onstart
+schtasks /create /tn "SbiePatch" /tr "%~dp0\bin_loader\patch.bat" /sc onstart /rl highest
 ```
 
-### 📕 证书配置
-> 驱动修补后需要重启UI才能在UI中导入证书
-1. 将生成的 `Certificate.dat` 复制到Sandboxie安装目录
+### 📕 导入证书
+> 修补驱动后需要重启UI才能在UI中导入证书 
+* 将生成的 `Certificate.dat` 复制到Sandboxie安装目录
 
-2. **或**在管理界面手动导入证书：
+* **或**在管理界面手动导入证书：
    ```
    SandMan -> 选项 -> 捐赠支持
    ```
@@ -77,7 +82,7 @@ schtasks /create /tn "SbiePatch" /tr "%~dp0\bin_loader\patch.bat" /sc onstart
 ## ⚠️ 安全声明
 > 本方案涉及系统驱动修改，作者不对产生的任何问题负责。
 
-可能产生的问题包括但不限于：
+可能产生的问题包括并不限于：
 1. 🟦 系统蓝屏
 2. 🔥 数据丢失
 3. 💥 沙箱逃逸

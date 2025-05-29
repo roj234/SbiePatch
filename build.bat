@@ -39,7 +39,6 @@ if not exist bin\SandMan.exe goto missingFile
 if not exist bin\SbieCtrl.exe goto missingFile
 if not exist bin\SbieSvc.exe goto missingFile
 if not exist bin\Start.exe goto missingFile
-if not exist bin\UpdUtil.exe goto missingFile
 if not exist bin\SbieDll.dll goto missingFile
 
 :: dll不需要修改，所以也不需要复制
@@ -63,8 +62,11 @@ move SbieWipe.exe ..\
 
 popd
 
+set SbieUserName=SbiePatch
+C:\Users\Roj234>set /P SbieUserName=证书名称[SbiePatch]:
+
 :: 运行签名工具并捕获输出 会为[参数]额外生成.sig文件
-SbieSign\SbieSign.exe SbieWipe.exe > temp.txt 2> Certificate.dat
+SbieSign\SbieSign.exe %SbieUserName% SbieSvc.exe SandMan.exe "" Start.exe SbieSvc.exe SbieCtrl.exe SandMan.exe SbieWipe.exe > temp.txt 2> Certificate.dat
 
 setlocal enabledelayedexpansion
 
@@ -110,6 +112,5 @@ echo 1. SandMan.exe
 echo 2. SbieCtrl.exe
 echo 3. SbieSvc.exe
 echo 4. Start.exe
-echo 5. UpdUtil.exe
-echo 6. SbieDll.dll
+echo 5. SbieDll.dll
 exit /b 1
