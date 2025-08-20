@@ -2,9 +2,9 @@
 set PATH=%PATH%;E:\llvm-mingw-20250514-msvcrt-x86_64\bin
 clang -v >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo ¼ì²âµ½ÄúÎ´°²×°LLVM-Mingw£¬»òÎ´ÆäÌí¼Óµ½PATH»·¾³±äÁ¿ÖĞ
-    echo ±¾ÏîÄ¿ĞèÒªLLVM-MingwÒÔ±àÒëÄÚºËÇı¶¯³ÌĞò
-    echo ¿ÉÔÚÏÂ·½ÍøÖ·ÏÂÔØLLVM-Mingw£¨~100MB£©
+    echo æ£€æµ‹åˆ°æ‚¨æœªå®‰è£…LLVM-Mingwï¼Œæˆ–æœªå…¶æ·»åŠ åˆ°PATHç¯å¢ƒå˜é‡ä¸­
+    echo æœ¬é¡¹ç›®éœ€è¦LLVM-Mingwä»¥ç¼–è¯‘å†…æ ¸é©±åŠ¨ç¨‹åº
+    echo å¯åœ¨ä¸‹æ–¹ç½‘å€ä¸‹è½½LLVM-Mingwï¼ˆ~100MBï¼‰
     echo https://github.com/mstorsjo/llvm-mingw/releases
     echo.
     pause
@@ -13,7 +13,7 @@ if %ERRORLEVEL% NEQ 0 (
 if not exist SbieSign\SbieSign.exe  (
     call SbieSign\build.bat
     if %ERRORLEVEL% neq 0 (
-        echo Error: Failed to compile SbieSign £¨%ERRORLEVEL%£©
+        echo Error: Failed to compile SbieSign ï¼ˆ%ERRORLEVEL%ï¼‰
         exit /b 1
     )
 )
@@ -21,7 +21,7 @@ if not exist SbieSign\SbieSign.exe  (
 if not exist Dll2Lib\Dll2Lib.exe  (
     call Dll2Lib\build.bat
     if %ERRORLEVEL% neq 0 (
-        echo Error: Failed to compile Dll2Lib £¨%ERRORLEVEL%£©
+        echo Error: Failed to compile Dll2Lib ï¼ˆ%ERRORLEVEL%ï¼‰
         exit /b 1
     )
 )
@@ -29,7 +29,7 @@ if not exist Dll2Lib\Dll2Lib.exe  (
 if not exist bin_loader\lua53-64.dll (
     call SbieLoader\build.bat
     if %ERRORLEVEL% neq 0 (
-        echo Error: Failed to compile SbieLoader £¨%ERRORLEVEL%£©
+        echo Error: Failed to compile SbieLoader ï¼ˆ%ERRORLEVEL%ï¼‰
         exit /b 1
     )
     move SbieLoader\lua53-64.dll bin_loader\
@@ -41,19 +41,19 @@ if not exist bin\SbieSvc.exe goto missingFile
 if not exist bin\Start.exe goto missingFile
 if not exist bin\SbieDll.dll goto missingFile
 
-:: dll²»ĞèÒªĞŞ¸Ä£¬ËùÒÔÒ²²»ĞèÒª¸´ÖÆ
+:: dllä¸éœ€è¦ä¿®æ”¹ï¼Œæ‰€ä»¥ä¹Ÿä¸éœ€è¦å¤åˆ¶
 copy bin\*.exe .
 
-:: ¹¹½¨SbieWipe
+:: æ„å»ºSbieWipe
 pushd SbieWipe
 
-:: ´ÓSbieDllÉú³É.aÎÄ¼şÓÃÓÚÒşÊ½Á´½Ó
+:: ä»SbieDllç”Ÿæˆ.aæ–‡ä»¶ç”¨äºéšå¼é“¾æ¥
 llvm-objdump -x ..\bin\SbieDll.dll | ..\Dll2Lib\Dll2Lib
 del libSbieDll.def
 
 call build.bat
 if %ERRORLEVEL% neq 0 (
-    echo Error: Failed to compile SbieWipe £¨%ERRORLEVEL%£©
+    echo Error: Failed to compile SbieWipe ï¼ˆ%ERRORLEVEL%ï¼‰
     exit /b 1
 )
 
@@ -63,14 +63,14 @@ move SbieWipe.exe ..\
 popd
 
 set SbieUserName=SbiePatch
-C:\Users\Roj234>set /P SbieUserName=Ö¤ÊéÃû³Æ[SbiePatch]:
+set /P SbieUserName=è¯ä¹¦åç§°[SbiePatch]:
 
-:: ÔËĞĞÇ©Ãû¹¤¾ß²¢²¶»ñÊä³ö »áÎª[²ÎÊı]¶îÍâÉú³É.sigÎÄ¼ş
+:: è¿è¡Œç­¾åå·¥å…·å¹¶æ•è·è¾“å‡º ä¼šä¸º[å‚æ•°]é¢å¤–ç”Ÿæˆ.sigæ–‡ä»¶
 SbieSign\SbieSign.exe %SbieUserName% SbieSvc.exe SandMan.exe "" Start.exe SbieSvc.exe SbieCtrl.exe SandMan.exe SbieWipe.exe > temp.txt 2> Certificate.dat
 
 setlocal enabledelayedexpansion
 
-:: ¼ì²é×îºóÒ»ĞĞÊÇ·ñÎª"All done"
+:: æ£€æŸ¥æœ€åä¸€è¡Œæ˜¯å¦ä¸º"All done"
 set "last_line="
 for /f "delims=" %%a in (temp.txt) do set "last_line=%%a"
 if not "%last_line%"=="All done" (
@@ -82,22 +82,22 @@ if not "%last_line%"=="All done" (
 )
 endlocal
 
-:: »ñÈ¡µÚÒ»ĞĞÄÚÈİ
+:: è·å–ç¬¬ä¸€è¡Œå†…å®¹
 set "first_line="
 < temp.txt set /p first_line=
 del temp.txt
 
-:: Ìæ»»Ô´´úÂëÖĞµÄÕ¼Î»·û
+:: æ›¿æ¢æºä»£ç ä¸­çš„å ä½ç¬¦
 powershell -Command "(Get-Content 'SbiePatch\SbiePatch.c.tpl') -replace 'PLACEHOLDER', '%first_line%' | Set-Content 'SbiePatch\SbiePatch.c'"
 if %ERRORLEVEL% neq 0 (
     echo Error: Failed to generate SbiePatch code
     exit /b 1
 )
 
-:: Ö´ĞĞ±àÒë½Å±¾
+:: æ‰§è¡Œç¼–è¯‘è„šæœ¬
 call SbiePatch\build.bat
 if %ERRORLEVEL% neq 0 (
-    echo Error: Failed to compile SbiePatch £¨%ERRORLEVEL%£©
+    echo Error: Failed to compile SbiePatch ï¼ˆ%ERRORLEVEL%ï¼‰
     exit /b 1
 )
 
@@ -107,7 +107,7 @@ echo All done
 exit /b 0
 
 :missingFile
-echo ÏÂÁĞ²¿·Ö»òÈ«²¿ÎÄ¼şÈ±Ê§£¬Çë¸´ÖÆµ½binÎÄ¼ş¼Ğ
+echo ä¸‹åˆ—éƒ¨åˆ†æˆ–å…¨éƒ¨æ–‡ä»¶ç¼ºå¤±ï¼Œè¯·å¤åˆ¶åˆ°binæ–‡ä»¶å¤¹
 echo 1. SandMan.exe
 echo 2. SbieCtrl.exe
 echo 3. SbieSvc.exe
