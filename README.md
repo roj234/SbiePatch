@@ -17,7 +17,6 @@
 | **Dll2Lib**               | Dll2Lib.exe   | 从DLL文件生成.a用于链接        |
 | **SbieLoader(CECheater)** | lua53-64.dll  | 替换CheatEngine导入的同名dll |
 | **SbiePatch**             | SbiePatch.sys | 动态替换SbieDrv驱动程序的公钥    |
-| **SbieSign**              | SbieSign.exe  | 生成新的证书、公钥和签名          |
 | **SbieWipe**              | SbieWipe.exe  | 清除证书屏蔽列表方便降级          |
 
 ## 🛠️ 编译
@@ -26,12 +25,12 @@
 - LLVM-MinGW (CLang 20+)
 - Sandboxie-Plus 原始二进制文件
 - 无需Windows SDK或Windows驱动SDK
+- NodeJS 20+ （大概吧，反正新一点肯定没问题，只是用来运行构建脚本）
 
 ### 🖊 编译配置 (通过修改build.bat)
 1. 注意SbieSign的私钥为了安全是不保存的一次性的，意味着**一旦程序退出，就不能再生成相同公钥的签名了**！
-2. (v1.2) 构建不是无人参与的，需要你设置生成证书的用户名
-3. 构建在10秒内完成，也无需联网，所以不用担心要在电脑之前等很久
-4. 你可以修改构建脚本来为你提供的其它程序生成sig文件
+2. 构建在10秒内完成，也无需联网，所以不用担心要在电脑之前等很久
+3. 你可以修改构建脚本来修改证书用户名，或为你提供的其它程序生成sig文件
 
 ### 🐙 编译
 1. 从官方Sandboxie-Plus复制以下文件到 `bin/` 目录：
@@ -43,12 +42,12 @@
 
 2. 执行构建脚本：
 ```bash
-build.bat
+node build.mjs
 ```
 
 3. 替换原版文件：  
-将项目文件夹(build.bat)目录中生成的所有exe和sig文件替换原版文件  
-* 编译时还生成了bin_loader/SbiePatch.sys
+将项目根目录中生成的所有exe和sig文件替换原版文件  
+* 同时生成了 `bin_loader/SbiePatch.sys`
 
 ## 🚀 部署
 

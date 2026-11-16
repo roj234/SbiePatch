@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License along with thi
 
 static wchar_t certificate[256] = {L'\0'};
 
-// Ä£ÄâÐÐ¶ÁÈ¡º¯Êý£¨´Ó×Ö·û´®ÖðÐÐ¶ÁÈ¡£©
+// Ä£ï¿½ï¿½ï¿½Ð¶ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½È¡ï¿½ï¿½
 char* Conf_Read_Line(char** stream, wchar_t* line, int* line_num) {
     static const wchar_t delimiters[] = L"\r\n";
     static wchar_t* next_token = NULL;
@@ -24,11 +24,11 @@ char* Conf_Read_Line(char** stream, wchar_t* line, int* line_num) {
     
     if (!token) return NULL;
     
-    // ¸´ÖÆµ±Ç°ÐÐµ½»º³åÇø
+    // ï¿½ï¿½ï¿½Æµï¿½Ç°ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     wcscpy_s(line, 1024, token);
     (*line_num)++;
-    *stream = (char*)next_token; // ¸üÐÂÁ÷Ö¸Õë
-    return (char*)1; // ·µ»Ø·ÇNULL±íÊ¾³É¹¦
+    *stream = (char*)next_token; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+    return (char*)1; // ï¿½ï¿½ï¿½Ø·ï¿½NULLï¿½ï¿½Ê¾ï¿½É¹ï¿½
 }
 
 NTSTATUS SignCertificate(BCRYPT_KEY_HANDLE hKey) {
@@ -38,12 +38,12 @@ NTSTATUS SignCertificate(BCRYPT_KEY_HANDLE hKey) {
     BCryptOpenAlgorithmProvider(&hHashAlg, KPH_HASH_ALGORITHM, NULL, 0);
     BCryptCreateHash(hHashAlg, &hHash, NULL, 0, NULL, 0, 0);
 
-    // ³õÊ¼»¯Á÷Ö¸Õë
+    // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
     char* stream = (char*)certificate;
     wchar_t line[1024];
     int line_num = 0;
 
-    // Ä£Äâ Conf_Read_Line µ÷ÓÃ
+    // Ä£ï¿½ï¿½ Conf_Read_Line ï¿½ï¿½ï¿½ï¿½
     while (Conf_Read_Line(&stream, line, &line_num)) {
         wchar_t* ptr = wcschr(line, L':');
         if (!ptr || ptr == line) {
@@ -51,29 +51,29 @@ NTSTATUS SignCertificate(BCRYPT_KEY_HANDLE hKey) {
             continue;
         }
 
-        // ½âÎö name ºÍ value
+        // ï¿½ï¿½ï¿½ï¿½ name ï¿½ï¿½ value
         wchar_t* name = line;
         wchar_t* value = ptr + 1;
 
-        // È¥³ý name Ä©Î²¿Õ°×
+        // È¥ï¿½ï¿½ name Ä©Î²ï¿½Õ°ï¿½
         while (ptr > line && *(ptr-1) <= 32) ptr--;
         *ptr = L'\0';
 
-        // È¥³ý value Ê×Î²¿Õ°×
+        // È¥ï¿½ï¿½ value ï¿½ï¿½Î²ï¿½Õ°ï¿½
         while (*value <= 32 && *value != L'\0') value++;
         ptr = value + wcslen(value);
         while (ptr > value && *(ptr-1) <= 32) ptr--;
         *ptr = L'\0';
 
-        // ´¦Àí SIGNATURE£¨Ê¾Àý£©
+        // ï¿½ï¿½ï¿½ï¿½ SIGNATUREï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
         if (_wcsicmp(L"SIGNATURE", name) == 0) continue;
 
-        // ×ª»»Îª UTF-8
+        // ×ªï¿½ï¿½Îª UTF-8
         char utf8_name[256], utf8_value[256];
         int name_len = WideCharToMultiByte(CP_UTF8, 0, name, -1, utf8_name, 256, NULL, NULL);
         int value_len = WideCharToMultiByte(CP_UTF8, 0, value, -1, utf8_value, 256, NULL, NULL);
 
-        // ´«µÝµ½¹þÏ£º¯Êý£¨È¥³ý½áÎ²Áã£©
+        // ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½Î²ï¿½ã£©
         if (name_len > 0) {
             BCryptHashData(hHash, (PUCHAR)utf8_name, name_len-1, 0);
         }
@@ -104,9 +104,9 @@ NTSTATUS SignCertificate(BCRYPT_KEY_HANDLE hKey) {
     return 0;
 }
 
-// Éú³ÉÊä³öÎÄ¼þÃû£ºÔ­ÎÄ¼þÃû + .sha
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½Ä¼ï¿½ï¿½ï¿½ + .sha
 BOOL GetOutputFileName(LPCSTR inputFile, LPSTR outputFile, DWORD maxLen) {
-    if (strlen(inputFile) > maxLen - 5) return FALSE; // ±£Áô¿Õ¼ä×·¼ÓÀ©Õ¹Ãû
+    if (strlen(inputFile) > maxLen - 5) return FALSE; // ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½×·ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½
 
     strcpy_s(outputFile, maxLen, inputFile);
     strcat_s(outputFile, maxLen, ".sig");
@@ -119,7 +119,7 @@ BOOL HashFile(const char* file, BYTE* hash) {
 
     FILE* fp = fopen(file, "rb");
     if (!fp) {
-        printf("ÕÒ²»µ½ %s\n", file);
+        printf("ï¿½Ò²ï¿½ï¿½ï¿½ %s\n", file);
         return FALSE;
     }
 
@@ -129,7 +129,7 @@ BOOL HashFile(const char* file, BYTE* hash) {
     BYTE buffer[1024];
     DWORD bytesRead;
 
-    // ¶ÁÈ¡ÎÄ¼þ²¢¸üÐÂ¹þÏ£
+    // ï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¹ï¿½Ï£
     while ((bytesRead = fread(buffer, 1, 1024, fp))) {
         BCryptHashData(hHash, buffer, bytesRead, 0);
     }
@@ -144,7 +144,7 @@ BOOL HashFile(const char* file, BYTE* hash) {
 }
 
 BOOL SignFile(BCRYPT_KEY_HANDLE hKey, const char* file) {
-    // »ñÈ¡×îÖÕ¹þÏ£Öµ
+    // ï¿½ï¿½È¡ï¿½ï¿½ï¿½Õ¹ï¿½Ï£Öµ
     BYTE hash[32];
     if (!HashFile(file, hash)) return FALSE;
 
@@ -180,13 +180,13 @@ int ReplaceContent(const char *filename, const unsigned char *A, const unsigned 
         NULL
     );
     if (hFile == INVALID_HANDLE_VALUE) {
-        fprintf(stderr, "ÎÄ¼þ´ò¿ªÊ§°Ü (Error %lu)\n", GetLastError());
+        fprintf(stderr, "ï¿½Ä¼ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ (Error %lu)\n", GetLastError());
         return -1;
     }
 
     LARGE_INTEGER fileSize;
     if (!GetFileSizeEx(hFile, &fileSize)) {
-        fprintf(stderr, "»ñÈ¡ÎÄ¼þ´óÐ¡Ê§°Ü (Error %lu)\n", GetLastError());
+        fprintf(stderr, "ï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½Ð¡Ê§ï¿½ï¿½ (Error %lu)\n", GetLastError());
         CloseHandle(hFile);
         return -1;
     }
@@ -205,7 +205,7 @@ int ReplaceContent(const char *filename, const unsigned char *A, const unsigned 
         NULL
     );
     if (hMapping == NULL) {
-        fprintf(stderr, "´´½¨ÄÚ´æÓ³ÉäÊ§°Ü (Error %lu)\n", GetLastError());
+        fprintf(stderr, "ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½Ó³ï¿½ï¿½Ê§ï¿½ï¿½ (Error %lu)\n", GetLastError());
         CloseHandle(hFile);
         return -1;
     }
@@ -218,7 +218,7 @@ int ReplaceContent(const char *filename, const unsigned char *A, const unsigned 
         fileSize.QuadPart
     );
     if (addr == NULL) {
-        fprintf(stderr, "ÄÚ´æÓ³ÉäÊÓÍ¼Ê§°Ü (Error %lu)\n", GetLastError());
+        fprintf(stderr, "ï¿½Ú´ï¿½Ó³ï¿½ï¿½ï¿½ï¿½Í¼Ê§ï¿½ï¿½ (Error %lu)\n", GetLastError());
         CloseHandle(hMapping);
         CloseHandle(hFile);
         return -1;
@@ -278,7 +278,7 @@ int main(int argc, char** argv) {
     wcscat(certificate, wideStr);
     wcscat(certificate, L"\nTYPE: ETERNAL");
 
-    // ÒÔCÓïÑÔÊý×é¸ñÊ½Êä³ö¹«Ô¿
+    // ï¿½ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¿
     printf("static const UCHAR Replace[] = { ");
     for (DWORD i = 0; i < cbPublicKey; i++) {
         printf("0x%02x", pbPublicKey[i]);
@@ -299,7 +299,7 @@ int main(int argc, char** argv) {
 
         int result = ReplaceContent(argv[i], officialKey, pbPublicKey, cbPublicKey);
         if (result != 1) {
-            if (result == 0) printf("Î´ÔÚ %s ÖÐÕÒµ½¹«Ô¿\n", "SbieSvc.exe");
+            if (result == 0) printf("Î´ï¿½ï¿½ %s ï¿½ï¿½ï¿½Òµï¿½ï¿½ï¿½Ô¿\n", argv[i]);
             goto cleanup;
         }
     }

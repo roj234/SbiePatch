@@ -1,5 +1,5 @@
 /*
-±¾ÎÄ¼şµÄËùÓĞ²¿·Ö¾ùÀ´×Ôlearn.microsoft.comÉÏµÄ¹«¿ªÎÄ±¾£¬±¾ÎÄ¼şÓëMicrosoft¼°Æä¹ØÁª¹«Ë¾Ã»ÓĞÈÎºÎ¹ØÏµ£¬±¾ÎÄ¼ş´úÂëµÄ°æÈ¨¹éÆäËùÓĞÕß¡£
+æœ¬æ–‡ä»¶çš„æ‰€æœ‰éƒ¨åˆ†å‡æ¥è‡ªlearn.microsoft.comä¸Šçš„å…¬å¼€æ–‡æœ¬ï¼Œæœ¬æ–‡ä»¶ä¸MicrosoftåŠå…¶å…³è”å…¬å¸æ²¡æœ‰ä»»ä½•å…³ç³»ï¼Œæœ¬æ–‡ä»¶ä»£ç çš„ç‰ˆæƒå½’å…¶æ‰€æœ‰è€…ã€‚
 */
 
 #include <windows.h>
@@ -246,6 +246,21 @@ PVOID MmMapLockedPagesSpecifyCache(
   IN           ULONG                                                                         BugCheckOnFailure,
   IN           ULONG                                                                         Priority
 );
+
+/* ---- MmMapLockedPagesSpecifyCache çš„ Priority / æ˜ å°„æ ‡å¿— ---- */
+#ifndef LowPagePriority
+#define LowPagePriority    0x10
+#endif
+#ifndef NormalPagePriority
+#define NormalPagePriority 0x20
+#endif
+#ifndef HighPagePriority
+#define HighPagePriority   0x30
+#endif
+/* åˆ«åçš„ PTE ä¸è¦å¸¦å¯æ‰§è¡Œå±æ€§ï¼ˆé¿å… W^X / HVCI ç›¸å…³é—®é¢˜ï¼‰ */
+#ifndef MdlMappingNoExecute
+#define MdlMappingNoExecute 0x40000000
+#endif
 void MmProbeAndLockPages(
   IN OUT PMDL            MemoryDescriptorList,
   IN      KPROCESSOR_MODE AccessMode,
@@ -258,8 +273,22 @@ void MmUnmapLockedPages(
 void MmUnlockPages(
   IN OUT PMDL MemoryDescriptorList
 );
+NTSTATUS MmProtectMdlSystemAddress(
+  IN PMDL MemoryDescriptorList,
+  IN ULONG NewProtect
+);
+BOOLEAN MmIsAddressValid(
+  IN PVOID VirtualAddress
+);
 
 #define NT_SUCCESS(x) ((x) == 0)
+
+#ifndef STATUS_INSUFFICIENT_RESOURCES
+#define STATUS_INSUFFICIENT_RESOURCES 0xC000009AL
+#endif
+#ifndef STATUS_NOT_MAPPED_VIEW
+#define STATUS_NOT_MAPPED_VIEW 0xC0000019L
+#endif
 
 typedef struct{} KEVENT, *PKEVENT;
 typedef struct{} SECTION_OBJECT_POINTERS, *PSECTION_OBJECT_POINTERS;
@@ -368,7 +397,7 @@ NTSTATUS IoCreateDevice(
 
 
 typedef struct {} IO_SECURITY_CONTEXT, *PIO_SECURITY_CONTEXT;
-// »¹ºÃÎÒÓÃ²»µ½
+// è¿˜å¥½æˆ‘ç”¨ä¸åˆ°
 #define POINTER_ALIGNMENT 
 typedef struct _IO_STACK_LOCATION {
   UCHAR                  MajorFunction;
